@@ -23,4 +23,5 @@
    - **Hierarchical embeddings:** `complete_icd10_hierarchy_embed.npz`  
    Both are stored in `data/mimiciv/2.2_icd9_subset_convert_icd10/icd10_part`.  
   
-
+### Note on Reproducibility Across Different GPUs
+During code revision, I discovered that there is some randomness in the processed dataset when using different GPUs, even if I have used a fixed random seed (SEED=1337). As a result, minor discrepancies may appear in the reproduced results when running the code on different hardware. You're suggested to tune the `beta` and `gamma`.

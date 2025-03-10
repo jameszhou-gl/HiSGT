@@ -1,0 +1,16 @@
+output
+*.pyc
+wandb/
+
+data/mimiciii/1.4_convert_icd10/*
+!data/mimiciii/1.4_convert_icd10/icd10_part
+!data/mimiciii/1.4_convert_icd10/build_dataset.py
+!data/mimiciii/1.4_convert_icd10/hcup_ccs_2015_definitions_benchmark.yaml
+!data/mimiciii/1.4_convert_icd10/README.md
+
+data/mimiciv/2.2_icd9_subset_convert_icd10/*
+!data/mimiciv/2.2_icd9_subset_convert_icd10/icd10_part
+!data/mimiciv/2.2_icd9_subset_convert_icd10/build_dataset.py
+!data/mimiciv/2.2_icd9_subset_convert_icd10/hcup_ccs_2015_definitions_benchmark.yaml
+!data/mimiciv/2.2_icd9_subset_convert_icd10/README.md
+
