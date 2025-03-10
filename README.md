@@ -26,6 +26,7 @@ Follow the README files in [data/mimiciii/](https://github.com/jameszhou-gl/HiSG
 This includes downloading raw MIMIC-III v1.4 and MIMIC-IV v2.2 datasets, extracting patient sequnces, processing them for model training, and constructing additional hierarchical and semantic embeddings.
 ### 3️⃣ Train Models, Generate Synthetic Data, and Evaluate
 Run the following scripts to train HiSGT and baselines. If Slurm is not available, you can adapt them into standard Bash commands.
+
 🔹 **For MIMIC-III:**
 ```bash
 sbatch scripts/mimiciii_1.4_convert_icd10/slurm_gpu_hisgt.sh   # Train HiSGT
