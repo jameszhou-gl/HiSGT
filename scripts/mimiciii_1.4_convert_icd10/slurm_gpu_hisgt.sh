@@ -41,8 +41,8 @@ nvidia-smi --query-gpu=index,name,utilization.gpu,utilization.memory,memory.tota
 
 echo "Job started at: $(date '+%Y-%m-%d-%H_%M_%S')"
 
-beta=0.987076
-gamma=0.53691
+beta=0.987
+gamma=0.537
 
 # Create a unique log directory for each run
 LOG_DIR="$BASE_LOG_DIR/${dataset}_${dataset_version}_run_hisgt_beta_${beta}_gamma_${gamma}"
