@@ -1,0 +1,14 @@
+app:
+  name: hisgt
+  version: 1.0.0
+  data_source: "csv"
+db:
+  host: localhost
+  port: 5432
+  database: hisgt_db
+  user: postgres
+  password: postgres
+  connection_string: postgresql://postgres:postgres@localhost:5432/hisgt
+csv:
+  inputdatafolderpath: input_data
+  omopvocabsfolderpath: omop_vocabs
