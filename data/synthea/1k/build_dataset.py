@@ -66,15 +66,17 @@ else:
         if not subject_visits or hadm_id not in subject_visits[-1]:
             subject_visits.append([])
         
-        if icd9_code:
-            subject_visits[-1].append(icd9_code)
-        else:
-            hadms_with_empty_diagnoses.append(hadm_id)
-        
-        if drug_code and drug_code != '0':
-            subject_visits[-1].append(f'{drug_code}')
-        else:
-            hadms_with_empty_drugs.append(hadm_id)
+        if config["patient_components"]["diagnoses"]:
+            if icd9_code:
+                subject_visits[-1].append(icd9_code)
+            else:
+                hadms_with_empty_diagnoses.append(hadm_id)
+                
+        if config["patient_components"]["drugs"]:
+            if drug_code and drug_code != '0':
+                subject_visits[-1].append(f'{drug_code}')
+            else:
+                hadms_with_empty_drugs.append(hadm_id)
 
     data = dict(data)
 

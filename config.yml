@@ -12,3 +12,9 @@ db:
 csv:
   inputdatafolderpath: input_data
   omopvocabsfolderpath: omop_vocabs
+patient_components:
+  demographics: false #todo
+  encounters: false #todo
+  diagnoses: true
+  drugs: true
+  procedures: false #todo
