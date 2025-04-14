@@ -4,7 +4,7 @@ from sqlalchemy import create_engine
 
 
 def OMOP_to_ICD9_conversion(args=None, db_name="postgres", db_config=None, save_csv=True):
-    
+
     """
     Associates OMOP condition occurrences with corresponding ICD-9 codes using concept 
     and relationship mappings defined in the OMOP CDM.
@@ -19,8 +19,11 @@ def OMOP_to_ICD9_conversion(args=None, db_name="postgres", db_config=None, save_
     This function performs the following steps:
 
     1. Filters the `df_concept` DataFrame to include only ICD-9-CM concepts.
-    2. Filters the `concept_relationship_df` to include only 'Maps to' relationships 
-       where the source concept (`concept_id_1`) is from the ICD-9 vocabulary.
+    2. Performs a reverse mapping by filtering `concept_relationship_df` to retain only 
+       'Maps to' relationships where the source concept (`concept_id_1`) belongs to the 
+       ICD-9 vocabulary. This enables us to trace back from standard OMOP concepts 
+       (used in condition occurrences) to their original ICD-9 source codes, allowing 
+       association of condition data with legacy or regulatory coding vocabulary standards.
     3. Joins the condition occurrence data (`df_cond_occurence`) with the OMOP concept table 
        to retrieve standard OMOP condition names.
     4. Merges this result with the filtered ICD-9 mappings to retain only conditions that 
