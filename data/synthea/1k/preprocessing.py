@@ -3,20 +3,28 @@ import os
 from sqlalchemy import create_engine
 
 
-def OMOP_to_ICD9_conversion(args=None, db_name="postgres", db_config=None,save_csv=True):
-
+def OMOP_to_ICD9_conversion(args=None, db_name="postgres", db_config=None, save_csv=True):
+    
     """
-    This function processes clinical condition data by associating each condition occurrence 
-    with its corresponding ICD-9 code, based on the OMOP Common Data Model (CDM). 
-    It performs the following steps:
+    Associates OMOP condition occurrences with corresponding ICD-9 codes using concept 
+    and relationship mappings defined in the OMOP CDM.
+
+    Parameters:
+        args (dict or None): Optional dictionary of runtime arguments or configurations.
+        db_name (str): Name of the target database (default is "postgres").
+        db_config (dict or None): Database connection details such as host, port, user, 
+                                  and password.
+        save_csv (bool): If True, the resulting DataFrame will be saved as a CSV file.
+
+    This function performs the following steps:
 
     1. Filters the `df_concept` DataFrame to include only ICD-9-CM concepts.
-    2. Filters the `concept_relationship_df` to include only 'Maps to' relationships where the 
-    source concept (`concept_id_1`) is from the ICD-9 vocabulary.
+    2. Filters the `concept_relationship_df` to include only 'Maps to' relationships 
+       where the source concept (`concept_id_1`) is from the ICD-9 vocabulary.
     3. Joins the condition occurrence data (`df_cond_occurence`) with the OMOP concept table 
-    to retrieve standard OMOP condition names.
-    4. Merges this result with the filtered ICD-9 mappings to retain only conditions that have 
-    a valid mapping to ICD-9.
+       to retrieve standard OMOP condition names.
+    4. Merges this result with the filtered ICD-9 mappings to retain only conditions that 
+       have a valid mapping to ICD-9.
     5. Joins again with the ICD-9 concept table to associate ICD-9 names and codes.
     6. Renames columns for clarity and drops unnecessary fields.
     7. Removes records lacking valid ICD-9 codes.
