@@ -73,8 +73,8 @@ else:
                 hadms_with_empty_diagnoses.append(hadm_id)
                 
         if config["patient_components"]["drugs"]:
-            if drug_code and drug_code != '0':
-                subject_visits[-1].append(f'{drug_code}')
+            if drug_code and str(drug_code) != '0':
+                subject_visits[-1].append(f'drg_{drug_code}')
             else:
                 hadms_with_empty_drugs.append(hadm_id)
 
