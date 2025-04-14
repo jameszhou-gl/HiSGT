@@ -2,7 +2,7 @@ app:
   name: hisgt
   version: 1.0.0
   data_source: "csv"
-db:
+db_connection:
   host: localhost
   port: 5432
   database: hisgt_db

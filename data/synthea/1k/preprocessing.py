@@ -36,7 +36,7 @@ def OMOP_to_ICD9_conversion(args=None, db_name="postgres", db_config=None, save_
     and their mapped ICD-9 codes, preparing the data for further analysis or integration.
     """
 
-    db_connection = db_config["db"]
+    db_connection = db_config["db_connection"]
 
     if db_name=='csv':
         # CSV Mode
