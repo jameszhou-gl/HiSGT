@@ -1,7 +1,7 @@
 app:
   name: hisgt
   version: 1.0.0
-  data_source: "csv"
+  data_source: "csv" # csv/postgres/sql
 db_connection:
   host: localhost
   port: 5432
@@ -11,7 +11,7 @@ db_connection:
   connection_string: postgresql://postgres:postgres@localhost:5432/hisgt
 csv:
   inputdatafolderpath: input_data # data/synthea/1k/input_data
-  omopvocabsfolderpath: omop_vocabs # data/synthea/1k/omop_vocabs
+  omopvocabsfolderpath: omop_vocabs # downloaded from Athena website - data/synthea/1k/omop_vocabs
 patient_components:
   demographics: false #todo
   encounters: false #todo
