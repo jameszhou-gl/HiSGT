@@ -97,7 +97,7 @@ def OMOP_to_ICD9_conversion(args=None, db_name="postgres", db_config=None, save_
         df_concept_relationship = pd.read_sql(query_concept_relationship, db_engine)
         df_cond_occurence = pd.read_sql(query_condition_occurrence, db_engine)
         df_visit_occurrence = pd.read_sql(query_visit_occurrence, db_engine)
-        df_drug_exposure = pd.read_csv(query_drug_exposure, dtype=str)
+        df_drug_exposure = pd.read_sql(query_drug_exposure, dtype=str)
 
 
     # Step 1: Filter df_concept to only ICD-9 concepts
