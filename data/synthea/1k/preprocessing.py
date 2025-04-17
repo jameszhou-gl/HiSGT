@@ -80,7 +80,7 @@ def OMOP_to_ICD9_conversion(args=None, db_name="postgres", db_config=None, save_
     elif db_name=='sql':
         # Database Mode
         try:
-            db_engine = create_engine(f"mysql+mysqldb://{db_connection['user']}:{db_connection['password']}@{db_connection['host']}:{db_connection['port']}/{db_connection['database']}")
+            db_engine = create_engine(f"mysql+pymssql://{db_connection['user']}:{db_connection['password']}@{db_connection['host']}:{db_connection['port']}/{db_connection['database']}")
             print("Database connection established successfully!")
         except Exception as e:
             print(f"Error connecting to the database: {e}")
