@@ -12,7 +12,7 @@ csv:
   inputdatafolderpath: input_data # data/synthea/1k/input_data
   omopvocabsfolderpath: omop_vocabs # downloaded from Athena website - data/synthea/1k/omop_vocabs
 patient_components:
-  demographics: false #todo
+  demographics: true
   encounters: false #todo
   diagnoses: true
   drugs: true

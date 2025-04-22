@@ -39,15 +39,15 @@ print(f"db_source: {db_source}")
 if db_source=="csv":
     print("Preprocessing CSVs into DataFrames")
     # visit_df = pd.read_csv("synthea1k_ICD9.csv").head(100)
-    visit_df = OMOP_to_ICD9_conversion(args=args, db_name="csv", db_config=config, save_csv=True)
+    visit_df = OMOP_to_ICD9_conversion(args=args, db_name="csv", config=config, save_csv=True)
 elif db_source=="postgres":
     ## connect to a db
     print("Preprocessing DB into DataFrames")
-    visit_df = OMOP_to_ICD9_conversion(db_name="postgres", db_config=config)
+    visit_df = OMOP_to_ICD9_conversion(db_name="postgres", config=config)
 elif db_source=="sql":
     ## connect to a db
     print("Preprocessing DB into DataFrames")
-    visit_df = OMOP_to_ICD9_conversion(db_name="sql", db_config=config)
+    visit_df = OMOP_to_ICD9_conversion(db_name="sql", config=config)
 
 
 if(visit_df is None):
@@ -56,15 +56,28 @@ if(visit_df is None):
 else:
     print("Building dataset")
     data = defaultdict(lambda: {'visits': []})
+    hadms_with_empty_gender = []
+    hadms_with_empty_race = []
     hadms_with_empty_diagnoses = []
     hadms_with_empty_drugs = []
 
     for row in tqdm(visit_df.itertuples(index=False), total=visit_df.shape[0]):
-        hadm_id, subject_id, icd9_code, drug_code = row.visit_occurrence_id, row.person_id, getattr(row, 'ICD9_CODE', None), getattr(row, 'drug_concept_id', None)
+        hadm_id, subject_id, icd9_code, drug_code, gender, race_concept_id ,race = row.visit_occurrence_id, row.person_id, getattr(row, 'ICD9_CODE', None), getattr(row, 'drug_concept_id', None), getattr(row, 'gender', None), getattr(row, 'race_concept_id', None), getattr(row, 'race', None)
         subject_visits = data[subject_id]['visits']
 
         if not subject_visits or hadm_id not in subject_visits[-1]:
             subject_visits.append([])
+
+        if config["patient_components"]["demographics"]:
+            if gender:
+                subject_visits[-1].append(gender)
+            else:
+                hadms_with_empty_gender.append(hadm_id)
+
+            if str(race_concept_id) !='0':
+                subject_visits[-1].append(race)
+            else:
+                hadms_with_empty_race.append(hadm_id)
         
         if config["patient_components"]["diagnoses"]:
             if icd9_code:

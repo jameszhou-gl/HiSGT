@@ -3,7 +3,7 @@ import os
 from sqlalchemy import create_engine
 
 
-def OMOP_to_ICD9_conversion(args=None, db_name="postgres", db_config=None, save_csv=True):
+def OMOP_to_ICD9_conversion(args=None, db_name="postgres", config=None, save_csv=True):
 
     """
     Associates OMOP condition occurrences with corresponding ICD-9 codes using concept 
@@ -36,18 +36,20 @@ def OMOP_to_ICD9_conversion(args=None, db_name="postgres", db_config=None, save_
     and their mapped ICD-9 codes, preparing the data for further analysis or integration.
     """
 
-    db_connection = db_config["db_connection"]
+    db_connection = config["db_connection"]
+    db_engine = None  # Initialize db_engine to None
 
     if db_name=='csv':
         # CSV Mode
-        omop_vocabs_path = f"data/{args.dataset}/{args.dataset_version}/"+db_config["csv"]["omopvocabsfolderpath"]
-        input_data_path = f"data/{args.dataset}/{args.dataset_version}/"+db_config["csv"]["inputdatafolderpath"]
+        omop_vocabs_path = f"data/{args.dataset}/{args.dataset_version}/"+config["csv"]["omopvocabsfolderpath"]
+        input_data_path = f"data/{args.dataset}/{args.dataset_version}/"+config["csv"]["inputdatafolderpath"]
 
         concept_file = os.path.join(omop_vocabs_path, 'CONCEPT.csv')
         concept_relationship_file = os.path.join(omop_vocabs_path, 'CONCEPT_RELATIONSHIP.csv')
         condition_occurrence_file = os.path.join(input_data_path, 'condition_occurrence.csv')
         visit_occurrence_file = os.path.join(input_data_path, 'visit_occurrence.csv')
         query_drug_exposure = os.path.join(input_data_path, 'drug_exposure.csv')
+        person = os.path.join(input_data_path, 'person.csv')
 
         # Load data from CSV
         df_concept = pd.read_csv(concept_file, sep="\t", dtype=str)
@@ -55,6 +57,7 @@ def OMOP_to_ICD9_conversion(args=None, db_name="postgres", db_config=None, save_
         df_concept_relationship = pd.read_csv(concept_relationship_file, sep="\t", dtype=str)
         df_visit_occurrence = pd.read_csv(visit_occurrence_file, dtype=str)
         df_drug_exposure = pd.read_csv(query_drug_exposure, dtype=str)
+        df_person = pd.read_csv(person, dtype=str)
 
     elif db_name=='postgres':
         # Database Mode
@@ -70,6 +73,7 @@ def OMOP_to_ICD9_conversion(args=None, db_name="postgres", db_config=None, save_
         query_condition_occurrence = "SELECT * FROM \"condition_occurrence\";"
         query_visit_occurrence = "SELECT * FROM \"visit_occurrence\";"
         query_drug_exposure = "SELECT * FROM \"drug_exposure\";"
+        query_person = "SELECT * FROM \"person\";"
 
         # Load data from Database
         df_concept = pd.read_sql(query_concept, db_engine)
@@ -77,6 +81,7 @@ def OMOP_to_ICD9_conversion(args=None, db_name="postgres", db_config=None, save_
         df_cond_occurence = pd.read_sql(query_condition_occurrence, db_engine)
         df_visit_occurrence = pd.read_sql(query_visit_occurrence, db_engine)
         df_drug_exposure = pd.read_sql(query_drug_exposure, dtype=str)
+        df_person = pd.read_sql(query_person, dtype=str)
     elif db_name=='sql':
         # Database Mode
         try:
@@ -91,6 +96,7 @@ def OMOP_to_ICD9_conversion(args=None, db_name="postgres", db_config=None, save_
         query_condition_occurrence = "SELECT * FROM condition_occurrence;"
         query_visit_occurrence = "SELECT * FROM visit_occurrence;"
         query_drug_exposure = "SELECT * FROM drug_exposure;"
+        query_person = "SELECT * FROM person;"
 
         # Load data from Database
         df_concept = pd.read_sql(query_concept, db_engine)
@@ -98,6 +104,13 @@ def OMOP_to_ICD9_conversion(args=None, db_name="postgres", db_config=None, save_
         df_cond_occurence = pd.read_sql(query_condition_occurrence, db_engine)
         df_visit_occurrence = pd.read_sql(query_visit_occurrence, db_engine)
         df_drug_exposure = pd.read_sql(query_drug_exposure, dtype=str)
+        df_person = pd.read_sql(query_person, dtype=str)
+
+    # close database connection
+    if db_engine is not None:
+        print("Closing database connection...")
+        db_engine.dispose()
+        print("Database connection closed.")
 
 
     # Step 1: Filter df_concept to only ICD-9 concepts
@@ -198,10 +211,13 @@ def OMOP_to_ICD9_conversion(args=None, db_name="postgres", db_config=None, save_
     merged_df_with_visit_clean = merged_df_with_visit_clean.merge(df_drug_exposure[['person_id', 'drug_concept_id','drug_name', 'drug_exposure_start_date','visit_occurrence_id']], on='visit_occurrence_id', how='left')\
         .drop(columns=['person_id_y']).rename(columns={'person_id_x': 'person_id'})
     
-    # df_person = df_person.merge(df_concept[['concept_id', 'concept_name']], left_on='gender_concept_id', right_on='concept_id', how='left').rename(columns={'concept_name': 'gender'}).drop(columns=['concept_id'])
-    # df_person = df_person.merge(df_concept[['concept_id', 'concept_name']], left_on='race_concept_id', right_on='concept_id', how='left').rename(columns={'concept_name': 'race'}).drop(columns=['concept_id'])
 
-    
+    # adding gender and race
+    if config["patient_components"]["demographics"]:
+        df_person = df_person.merge(df_concept[['concept_id', 'concept_name']], left_on='gender_concept_id', right_on='concept_id', how='left').rename(columns={'concept_name': 'gender'}).drop(columns=['concept_id'])
+        df_person = df_person.merge(df_concept[['concept_id', 'concept_name']], left_on='race_concept_id', right_on='concept_id', how='left').rename(columns={'concept_name': 'race'}).drop(columns=['concept_id'])
+        merged_df_with_visit_clean = merged_df_with_visit_clean.merge(df_person[['person_id','gender_concept_id', 'gender', 'year_of_birth','birth_datetime','race_concept_id','race']], on='person_id', how='left')
+        
     if save_csv:
         merged_df_with_visit_clean.to_csv('synthea1k_ICD9.csv',index=True)
 
