@@ -211,13 +211,36 @@ def OMOP_to_ICD9_conversion(args=None, db_name="postgres", config=None, save_csv
     merged_df_with_visit_clean = merged_df_with_visit_clean.merge(df_drug_exposure[['person_id', 'drug_concept_id','drug_name', 'drug_exposure_start_date','visit_occurrence_id']], on='visit_occurrence_id', how='left')\
         .drop(columns=['person_id_y']).rename(columns={'person_id_x': 'person_id'})
     
+    # Ensure visit_start_date is less than or equal to drug_exposure_start_date
+    merged_df_with_visit_clean['visit_start_date'] = pd.to_datetime(merged_df_with_visit_clean['visit_start_date'])
+    merged_df_with_visit_clean['drug_exposure_start_date'] = pd.to_datetime(merged_df_with_visit_clean['drug_exposure_start_date'])
+    merged_df_with_visit_clean = merged_df_with_visit_clean[
+        merged_df_with_visit_clean['visit_start_date'] <= merged_df_with_visit_clean['drug_exposure_start_date']
+    ]
 
-    # adding gender and race
+    # adding age, gender and race
     if config["patient_components"]["demographics"]:
+        # add gender and race
         df_person = df_person.merge(df_concept[['concept_id', 'concept_name']], left_on='gender_concept_id', right_on='concept_id', how='left').rename(columns={'concept_name': 'gender'}).drop(columns=['concept_id'])
         df_person = df_person.merge(df_concept[['concept_id', 'concept_name']], left_on='race_concept_id', right_on='concept_id', how='left').rename(columns={'concept_name': 'race'}).drop(columns=['concept_id'])
         merged_df_with_visit_clean = merged_df_with_visit_clean.merge(df_person[['person_id','gender_concept_id', 'gender', 'year_of_birth','birth_datetime','race_concept_id','race']], on='person_id', how='left')
         
+        # calculate age
+        # merged_df_with_visit_clean['visit_start_date'] = pd.to_datetime(merged_df_with_visit_clean['visit_start_date'])
+        merged_df_with_visit_clean['birth_datetime'] = pd.to_datetime(merged_df_with_visit_clean['birth_datetime'])
+
+        # Calculate age as the difference in years between visit_start_date and birth_datetime
+        merged_df_with_visit_clean['age'] = (
+            merged_df_with_visit_clean['visit_start_date'].dt.year - merged_df_with_visit_clean['birth_datetime'].dt.year
+        )
+
+        # Adjust age for cases where the visit occurs before the birthday in the same year
+        merged_df_with_visit_clean['age'] -= (
+            (merged_df_with_visit_clean['visit_start_date'].dt.month < merged_df_with_visit_clean['birth_datetime'].dt.month) |
+            ((merged_df_with_visit_clean['visit_start_date'].dt.month == merged_df_with_visit_clean['birth_datetime'].dt.month) &
+            (merged_df_with_visit_clean['visit_start_date'].dt.day < merged_df_with_visit_clean['birth_datetime'].dt.day))
+        ).astype(int)
+
     if save_csv:
         merged_df_with_visit_clean.to_csv('synthea1k_ICD9.csv',index=True)
 
