@@ -3,7 +3,7 @@ import os
 from sqlalchemy import create_engine
 
 
-def OMOP_to_ICD9_conversion(args=None, db_name="postgres", config=None, save_csv=True):
+def OMOP_fields_extraction(args=None, db_name="postgres", config=None, save_csv=True):
 
     """
     Associates OMOP condition occurrences with corresponding ICD-9 codes using concept 

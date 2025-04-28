@@ -9,7 +9,7 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 from sklearn.model_selection import train_test_split
-from preprocessing import OMOP_to_ICD9_conversion
+from preprocessing import OMOP_fields_extraction
 
 import warnings
 warnings.filterwarnings('ignore')
@@ -39,15 +39,15 @@ print(f"db_source: {db_source}")
 if db_source=="csv":
     print("Preprocessing CSVs into DataFrames")
     # visit_df = pd.read_csv("synthea1k_ICD9.csv").head(100)
-    visit_df = OMOP_to_ICD9_conversion(args=args, db_name="csv", config=config, save_csv=True)
+    visit_df = OMOP_fields_extraction(args=args, db_name="csv", config=config, save_csv=True)
 elif db_source=="postgres":
     ## connect to a db
     print("Preprocessing DB into DataFrames")
-    visit_df = OMOP_to_ICD9_conversion(db_name="postgres", config=config)
+    visit_df = OMOP_fields_extraction(db_name="postgres", config=config)
 elif db_source=="sql":
     ## connect to a db
     print("Preprocessing DB into DataFrames")
-    visit_df = OMOP_to_ICD9_conversion(db_name="sql", config=config)
+    visit_df = OMOP_fields_extraction(db_name="sql", config=config)
 
 
 if(visit_df is None):
