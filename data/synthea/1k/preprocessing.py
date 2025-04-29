@@ -3,7 +3,7 @@ import os
 from sqlalchemy import create_engine
 
 
-def OMOP_to_ICD9_conversion(args=None, db_name="postgres", config=None, save_csv=True):
+def OMOP_fields_extraction(args=None, db_name="postgres", config=None, save_csv=True):
 
     """
     Associates OMOP condition occurrences with corresponding ICD-9 codes using concept 
@@ -31,9 +31,11 @@ def OMOP_to_ICD9_conversion(args=None, db_name="postgres", config=None, save_csv
     5. Joins again with the ICD-9 concept table to associate ICD-9 names and codes.
     6. Renames columns for clarity and drops unnecessary fields.
     7. Removes records lacking valid ICD-9 codes.
+    8. Added drugs exposure data by merging with the drug exposure table.
+    9. Added age, gender and race information by merging with the person table.
 
     The final DataFrame links condition occurrences with both standard OMOP concept names 
-    and their mapped ICD-9 codes, preparing the data for further analysis or integration.
+    and their mapped ICD-9 codes and demographics, preparing the data for further analysis or integration.
     """
 
     db_connection = config["db_connection"]
