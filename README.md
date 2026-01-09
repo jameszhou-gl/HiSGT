@@ -48,13 +48,14 @@ We acknowledge the [HALO](https://github.com/btheodorou99/HALO_Inpatient) and [E
 If you find our work useful in your research, please consider citing:
 
 ```tex
-@misc{zhou2025generatingclinicallyrealisticehr,
-      title={Generating Clinically Realistic EHR Data via a Hierarchy- and Semantics-Guided Transformer}, 
-      author={Guanglin Zhou and Sebastiano Barbieri},
-      year={2025},
-      eprint={2502.20719},
-      archivePrefix={arXiv},
-      primaryClass={cs.LG},
-      url={https://arxiv.org/abs/2502.20719}, 
+@INCOLLECTION{Zhou2025-mt,
+  title     = "Generating Clinically Realistic {EHR} data via a Hierarchy- and
+               Semantics-Guided Transformer",
+  booktitle = "Frontiers in Artificial Intelligence and Applications",
+  author    = "Zhou, Guanglin and Barbieri, Sebastiano",
+  publisher = "IOS Press",
+  series    = "Frontiers in Artificial Intelligence and Applications",
+  month     =  oct,
+  year      =  2025
 }
 ```
